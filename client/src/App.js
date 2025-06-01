@@ -29,7 +29,7 @@ function App() {
       return;
     }
     try {
-        const res = await fetch('http://localhost:5001/api/track', {
+        const res = await fetch('https://amazon-price-notifier.onrender.com/api/track', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ email, url, targetPrice: parseFloat(price) }),
