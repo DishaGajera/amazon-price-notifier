@@ -42,7 +42,7 @@ mongoose.connect(process.env.MONGO_URI, {
 app.use('/api/track', trackerRoutes);
 
 // Cron job runs every minutes
-cron.schedule('*/30 * * * *', async () => {
+cron.schedule('* * * * *', async () => {
   console.log('Running scheduled price check...');
   const items = await TrackedItem.find();
 
