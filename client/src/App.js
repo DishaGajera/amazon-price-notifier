@@ -1,4 +1,6 @@
 import React, { useState } from 'react';
+import './App.css';
+import NotificationsActiveIcon from '@mui/icons-material/NotificationsActive';
 import {
   Container,
   TextField,
@@ -29,7 +31,7 @@ function App() {
       return;
     }
     try {
-        const res = await fetch('https://amazon-price-notifier.onrender.com/api/track', {
+      const res = await fetch('https://amazon-price-notifier.onrender.com/api/track', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ email, url, targetPrice: parseFloat(price) }),
@@ -60,12 +62,19 @@ function App() {
 
   return (
     <Container maxWidth="sm" sx={{ mt: 8 }}>
-    <Typography variant="h3" align="center" gutterBottom color="primary" fontWeight="bold">
-      Amazon Price Drop Notifier
-    </Typography>
+      <Box className="title-container">
+        <Typography className="title-text">
+          <NotificationsActiveIcon fontSize="medium" />
+          Amazon Price Drop Notifier
+        </Typography>
+        <Typography className="subtitle-text">
+          Get notified when your favorite Amazon item drops in price!
+        </Typography>
+      </Box>
 
       <Box component="form" onSubmit={handleSubmit} sx={{ display: 'flex', flexDirection: 'column', gap: 2 }}>
         <TextField
+          className="custom-textfield"
           type="email"
           label="Your Email"
           value={email}
@@ -73,6 +82,7 @@ function App() {
           required
         />
         <TextField
+          className="custom-textfield"
           type="url"
           label="Amazon Product URL"
           value={url}
@@ -80,21 +90,33 @@ function App() {
           required
         />
         <TextField
+          className="custom-textfield"
           type="number"
           label="Target Price"
           value={price}
           onChange={(e) => setPrice(e.target.value)}
           required
         />
-    
+
         <Button
+          className="custom-button"
           type="submit"
           variant="contained"
           color="primary"
           disabled={!emailRegex.test(email) || loading}
-    >
+        >
           {loading ? <CircularProgress size={24} color="inherit" /> : 'Track'}
         </Button>
+
+        <Typography
+          variant="body2"
+          color="textSecondary"
+          align="center"
+          sx={{ mt: 2, fontStyle: 'italic' }}
+        >
+          Make sure the Amazon product URL you enter is correct.
+        </Typography>
+
       </Box>
 
       <Snackbar

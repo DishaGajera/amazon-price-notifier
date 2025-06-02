@@ -63,7 +63,7 @@ async function runBackgroundTask() {
 }
 
 runBackgroundTask();
-// Cron job runs every 30 minutes.
+// Cron job runs every 10 minutes.
 cron.schedule('*/10 * * * *', () => {
   runBackgroundTask().catch(err => {
     console.error('Error in scheduled task:', err);
