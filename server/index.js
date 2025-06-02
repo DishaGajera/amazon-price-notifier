@@ -34,8 +34,8 @@ mongoose.connect(process.env.MONGO_URI, {
   useNewUrlParser: true,
   useUnifiedTopology: true
 })
-.then(() => console.log('MongoDB connected'))
-.catch(err => console.error('MongoDB connection error:', err));
+  .then(() => console.log('MongoDB connected'))
+  .catch(err => console.error('MongoDB connection error:', err));
 
 
 //Routes
@@ -45,21 +45,27 @@ async function runBackgroundTask() {
   console.log('Running scheduled price check...');
   const items = await TrackedItem.find();
 
-  for (let item of items) {
-    if (!item.notified) {
+  const tasks = items.map(async (item) => {
+    if (item.notified) return;
+
+    try {
       const currentPrice = await getAmazonPrice(item.url);
-      console.log(`current price: ${currentPrice}`);
-      if (!currentPrice) continue;
-  
-      console.log(`${item.targetPrice}`)
-  
+      if (!currentPrice) return;
+
+      console.log(`Current: ${currentPrice}, Target: ${item.targetPrice}`);
+
       if (currentPrice <= item.targetPrice) {
         await sendNotification(item.email, item.url, currentPrice);
         item.notified = true;
         await item.save();
       }
+    } catch (err) {
+      console.error(`Error processing item ${item.url}:`, err);
     }
-  }
+  });
+
+  await Promise.allSettled(tasks);
+  console.log('Background task finished.');
 }
 
 runBackgroundTask();
