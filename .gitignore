@@ -9,6 +9,7 @@
 # Ignore environment variables
 .env
 server/.env
+*/.env
 
 # Ignore node_modules everywhere
 node_modules/
