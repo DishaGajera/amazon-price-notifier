@@ -41,24 +41,34 @@ mongoose.connect(process.env.MONGO_URI, {
 //Routes
 app.use('/api/track', trackerRoutes);
 
-// Cron job runs every minutes
-cron.schedule('* * * * *', async () => {
+async function runBackgroundTask() {
   console.log('Running scheduled price check...');
   const items = await TrackedItem.find();
 
   for (let item of items) {
-    const currentPrice = await getAmazonPrice(item.url);
-    console.log(`current price: ${currentPrice}`);
-    if (!currentPrice) continue;
-
-    console.log(`${item.targetPrice}`)
-
-    if (currentPrice <= item.targetPrice && !item.notified) {
-      await sendNotification(item.email, item.url, currentPrice);
-      item.notified = true;
-      await item.save();
+    if (!item.notified) {
+      const currentPrice = await getAmazonPrice(item.url);
+      console.log(`current price: ${currentPrice}`);
+      if (!currentPrice) continue;
+  
+      console.log(`${item.targetPrice}`)
+  
+      if (currentPrice <= item.targetPrice) {
+        await sendNotification(item.email, item.url, currentPrice);
+        item.notified = true;
+        await item.save();
+      }
     }
   }
+}
+
+runBackgroundTask();
+// Cron job runs every 30 minutes.
+cron.schedule('*/30 * * * *', () => {
+  runBackgroundTask().catch(err => {
+    console.error('Error in scheduled task:', err);
+  });
+  console.log('Scheduled task completed');
 });
 
 app.listen(5001, () => {
