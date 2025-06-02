@@ -96,6 +96,7 @@ function App() {
           value={price}
           onChange={(e) => setPrice(e.target.value)}
           required
+          inputProps={{ min: 1 }}
         />
 
         <Button
